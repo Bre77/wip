@@ -1,0 +1,1 @@
+{"root":["./functions/types.ts","./functions/api/_middleware.ts","./functions/api/github.ts","./functions/api/items.ts","./functions/api/items/[id].ts","./functions/auth/callback.ts","./functions/auth/login.ts","./functions/auth/logout.ts","./functions/auth/me.ts","./functions/auth/session.ts"],"version":"5.9.3"}

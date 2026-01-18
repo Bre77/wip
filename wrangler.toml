@@ -1,0 +1,19 @@
+name = "wip-tracker"
+compatibility_date = "2024-12-01"
+pages_build_output_dir = "dist"
+
+# D1 Database for priority and notes
+[[d1_databases]]
+binding = "DB"
+database_name = "wip-tracker-db"
+database_id = "local"  # Will be replaced with actual ID after creation
+
+# KV Namespace for GitHub API cache
+[[kv_namespaces]]
+binding = "CACHE"
+id = "local"  # Will be replaced with actual ID after creation
+
+# Environment variables (set these in Cloudflare dashboard or .dev.vars)
+# GITHUB_CLIENT_ID = "your-client-id"
+# GITHUB_CLIENT_SECRET = "your-client-secret"
+# SESSION_SECRET = "random-32-char-string"
