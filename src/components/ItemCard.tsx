@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import Markdown from 'react-markdown';
 import type { WorkItem } from '../lib/types';
 
 interface ItemCardProps {
@@ -113,8 +114,8 @@ export function ItemCard({ item, onUpdateNotes, onToggleHidden }: ItemCardProps)
             <div className="mt-3 space-y-3">
               {/* Body */}
               {item.body && (
-                <div className="text-xs text-gray-300 bg-gray-900 rounded p-2 max-h-32 overflow-y-auto whitespace-pre-wrap">
-                  {item.body}
+                <div className="text-xs text-gray-300 bg-gray-900 rounded p-2 max-h-32 overflow-y-auto prose prose-invert prose-xs prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-headings:my-1 prose-a:text-blue-400">
+                  <Markdown>{item.body.replace(/<!--[\s\S]*?-->/g, '')}</Markdown>
                 </div>
               )}
 

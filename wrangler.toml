@@ -6,12 +6,12 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "wip-tracker-db"
-database_id = "local"  # Will be replaced with actual ID after creation
+database_id = "021b8c54-f24f-4da5-b229-b10ecba33c47"
 
 # KV Namespace for GitHub API cache
 [[kv_namespaces]]
 binding = "CACHE"
-id = "local"  # Will be replaced with actual ID after creation
+id = "dae4b9f4ea9d4ee6aa0f65ee5871620e"
 
 # Environment variables (set these in Cloudflare dashboard or .dev.vars)
 # GITHUB_CLIENT_ID = "your-client-id"
