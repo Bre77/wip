@@ -13,7 +13,5 @@ database_id = "021b8c54-f24f-4da5-b229-b10ecba33c47"
 binding = "CACHE"
 id = "dae4b9f4ea9d4ee6aa0f65ee5871620e"
 
-# Environment variables (set these in Cloudflare dashboard or .dev.vars)
-# GITHUB_CLIENT_ID = "your-client-id"
-# GITHUB_CLIENT_SECRET = "your-client-secret"
-# SESSION_SECRET = "random-32-char-string"
+# Environment variables
+GITHUB_CLIENT_ID = "Ov23liqVcFaMIeQy7Zdg"
