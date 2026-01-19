@@ -54,6 +54,7 @@ export function ItemCard({ item, onUpdateNotes, onToggleHidden }: ItemCardProps)
   const age = getAge(item.createdAt);
   const ageColor = getAgeColor(age.days);
   const ageIndicator = getAgeIndicator(age.days);
+  const updatedAge = getAge(item.updatedAt);
 
   const handleSaveNotes = () => {
     const trimmed = notesValue.trim();
@@ -106,6 +107,10 @@ export function ItemCard({ item, onUpdateNotes, onToggleHidden }: ItemCardProps)
             <span className="text-gray-600">&middot;</span>
             <span className={ageColor}>
               {age.text}{ageIndicator}
+            </span>
+            <span className="text-gray-600">&middot;</span>
+            <span className="text-gray-500">
+              updated {updatedAge.text}
             </span>
           </div>
 
