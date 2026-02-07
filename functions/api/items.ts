@@ -23,6 +23,7 @@ function combineItems(
       number: gh.number,
       url: gh.url,
       repo: gh.repository.nameWithOwner,
+      isDraft: gh.isDraft ?? false,
       createdAt: gh.createdAt,
       updatedAt: gh.updatedAt,
       priority: work?.priority ?? index + 1000, // Default priority for new items

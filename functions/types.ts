@@ -26,6 +26,7 @@ export interface GitHubItem {
   body: string | null;
   number: number;
   url: string;
+  isDraft?: boolean;
   createdAt: string;
   updatedAt: string;
   repository: {
@@ -42,6 +43,7 @@ export interface CombinedItem {
   number: number;
   url: string;
   repo: string;
+  isDraft: boolean;
   createdAt: string;
   updatedAt: string;
   priority: number;
