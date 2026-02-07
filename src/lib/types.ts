@@ -7,6 +7,7 @@ export interface WorkItem {
   number: number;
   url: string;
   repo: string;
+  isDraft: boolean;
   createdAt: string;
   updatedAt: string;
   priority: number;

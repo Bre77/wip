@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { WorkItem } from '../lib/types';
 import {
   fetchItems,
@@ -14,6 +14,9 @@ export function useItems(authenticated: boolean) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  const draftPRs = useMemo(() => pullRequests.filter(pr => pr.isDraft), [pullRequests]);
+  const openPRs = useMemo(() => pullRequests.filter(pr => !pr.isDraft), [pullRequests]);
 
   const loadItems = useCallback(async () => {
     if (!authenticated) return;
@@ -48,7 +51,20 @@ export function useItems(authenticated: boolean) {
   }, [authenticated, loadItems]);
 
   const reorderPRs = useCallback(async (items: WorkItem[]) => {
-    setPullRequests(items);
+    // Merge reordered subset back with the other subset
+    setPullRequests(prev => {
+      const otherPRs = prev.filter(pr => pr.isDraft);
+      return [...items, ...otherPRs];
+    });
+    const updates = items.map((item, index) => ({ id: item.id, priority: index }));
+    await batchUpdatePriorities(updates);
+  }, []);
+
+  const reorderDraftPRs = useCallback(async (items: WorkItem[]) => {
+    setPullRequests(prev => {
+      const otherPRs = prev.filter(pr => !pr.isDraft);
+      return [...otherPRs, ...items];
+    });
     const updates = items.map((item, index) => ({ id: item.id, priority: index }));
     await batchUpdatePriorities(updates);
   }, []);
@@ -83,12 +99,15 @@ export function useItems(authenticated: boolean) {
 
   return {
     pullRequests,
+    draftPRs,
+    openPRs,
     issues,
     loading,
     error,
     refreshing,
     refresh,
     reorderPRs,
+    reorderDraftPRs,
     reorderIssues,
     updateNotes,
     toggleHidden,

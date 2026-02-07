@@ -14,6 +14,7 @@ const PULL_REQUESTS_QUERY = `
           body
           number
           url
+          isDraft
           createdAt
           updatedAt
           repository {

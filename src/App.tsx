@@ -11,21 +11,36 @@ function App() {
   const authenticated = user?.authenticated ?? false;
 
   const {
-    pullRequests,
+    draftPRs,
+    openPRs,
     issues,
     loading: itemsLoading,
     error,
     refreshing,
     refresh,
     reorderPRs,
+    reorderDraftPRs,
     reorderIssues,
     updateNotes,
     toggleHidden,
   } = useItems(authenticated);
 
-  // Separate filter state for PRs and Issues
+  // Separate filter state for each column
+  const [draftPrFilteredRepos, setDraftPrFilteredRepos] = useState<Set<string>>(new Set());
   const [prFilteredRepos, setPrFilteredRepos] = useState<Set<string>>(new Set());
   const [issueFilteredRepos, setIssueFilteredRepos] = useState<Set<string>>(new Set());
+
+  const toggleDraftPrRepo = useCallback((repo: string) => {
+    setDraftPrFilteredRepos(prev => {
+      const next = new Set(prev);
+      if (next.has(repo)) {
+        next.delete(repo);
+      } else {
+        next.add(repo);
+      }
+      return next;
+    });
+  }, []);
 
   const togglePrRepo = useCallback((repo: string) => {
     setPrFilteredRepos(prev => {
@@ -103,17 +118,34 @@ function App() {
           <div className="text-gray-400">Loading items...</div>
         </div>
       ) : (
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-x divide-gray-800">
-          {/* Pull Requests Column */}
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 divide-x divide-gray-800">
+          {/* Draft PRs Column */}
           <div className="flex flex-col min-h-0">
             <RepoFilters
-              items={pullRequests}
+              items={draftPRs}
+              selectedRepos={draftPrFilteredRepos}
+              onToggleRepo={toggleDraftPrRepo}
+            />
+            <ItemList
+              title="Draft PRs"
+              items={draftPRs}
+              filteredRepos={draftPrFilteredRepos}
+              onReorder={reorderDraftPRs}
+              onUpdateNotes={updateNotes}
+              onToggleHidden={toggleHidden}
+            />
+          </div>
+
+          {/* Open PRs Column */}
+          <div className="flex flex-col min-h-0">
+            <RepoFilters
+              items={openPRs}
               selectedRepos={prFilteredRepos}
               onToggleRepo={togglePrRepo}
             />
             <ItemList
-              title="Pull Requests"
-              items={pullRequests}
+              title="Open PRs"
+              items={openPRs}
               filteredRepos={prFilteredRepos}
               onReorder={reorderPRs}
               onUpdateNotes={updateNotes}
