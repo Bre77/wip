@@ -1,4 +1,5 @@
 import type { Env } from '../../types';
+import { PRIORITY_LEVELS } from '../../types';
 import type { AuthenticatedData } from '../_middleware';
 
 interface UpdateItemRequest {
@@ -6,6 +7,8 @@ interface UpdateItemRequest {
   notes?: string | null;
   hidden?: boolean;
 }
+
+const validPriorities = new Set<number>(Object.values(PRIORITY_LEVELS));
 
 export const onRequestPut: PagesFunction<Env, string, AuthenticatedData> = async (context) => {
   const { env, data, request, params } = context;
@@ -18,6 +21,11 @@ export const onRequestPut: PagesFunction<Env, string, AuthenticatedData> = async
 
   // Extract item type from ID (format: "pr:owner/repo#123" or "issue:owner/repo#123")
   const itemType = id.startsWith('pr:') ? 'pr' : 'issue';
+
+  // Validate priority if provided
+  if (body.priority !== undefined && !validPriorities.has(body.priority)) {
+    return Response.json({ error: 'Invalid priority. Must be 0-4 (uber, high, normal, low, meh)' }, { status: 400 });
+  }
 
   // Build the upsert query dynamically based on what fields are provided
   const updates: string[] = [];
@@ -56,7 +64,7 @@ export const onRequestPut: PagesFunction<Env, string, AuthenticatedData> = async
     ).bind(...values, id, session.userId).run();
   } else {
     // Insert new with defaults
-    const priority = body.priority ?? 1000;
+    const priority = body.priority ?? PRIORITY_LEVELS.low;
     const notes = body.notes ?? null;
     const hidden = body.hidden ? 1 : 0;
 
@@ -65,41 +73,6 @@ export const onRequestPut: PagesFunction<Env, string, AuthenticatedData> = async
        VALUES (?, ?, ?, ?, ?, ?)`
     ).bind(id, session.userId, itemType, priority, notes, hidden).run();
   }
-
-  return Response.json({ success: true });
-};
-
-// Batch update priorities (for drag-and-drop reordering)
-export const onRequestPost: PagesFunction<Env, string, AuthenticatedData> = async (context) => {
-  const { env, data, request, params } = context;
-
-  // Check if this is a batch operation
-  const id = decodeURIComponent(params.id as string);
-  if (id !== 'batch-priority') {
-    return Response.json({ error: 'Invalid operation' }, { status: 400 });
-  }
-
-  const { session } = data;
-  const { DB } = env;
-  const body = await request.json<{ items: Array<{ id: string; priority: number }> }>();
-
-  if (!Array.isArray(body.items)) {
-    return Response.json({ error: 'Invalid items array' }, { status: 400 });
-  }
-
-  // Update all priorities in a batch
-  const stmt = DB.prepare(
-    `INSERT INTO work_items (id, user_id, item_type, priority, notes, hidden)
-     VALUES (?, ?, ?, ?, NULL, 0)
-     ON CONFLICT(id) DO UPDATE SET priority = excluded.priority, updated_at = CURRENT_TIMESTAMP`
-  );
-
-  const batch = body.items.map(item => {
-    const itemType = item.id.startsWith('pr:') ? 'pr' : 'issue';
-    return stmt.bind(item.id, session.userId, itemType, item.priority);
-  });
-
-  await DB.batch(batch);
 
   return Response.json({ success: true });
 };

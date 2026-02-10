@@ -1,4 +1,4 @@
-import type { ItemsResponse, User } from './types';
+import type { ItemsResponse, PriorityValue, User } from './types';
 
 const API_BASE = '';
 
@@ -22,7 +22,7 @@ export async function refreshItems(): Promise<void> {
   }
 }
 
-export async function updateItemPriority(id: string, priority: number): Promise<void> {
+export async function updateItemPriority(id: string, priority: PriorityValue): Promise<void> {
   const response = await fetch(`${API_BASE}/api/items/${encodeURIComponent(id)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -52,17 +52,6 @@ export async function updateItemHidden(id: string, hidden: boolean): Promise<voi
   });
   if (!response.ok) {
     throw new Error('Failed to update hidden status');
-  }
-}
-
-export async function batchUpdatePriorities(items: Array<{ id: string; priority: number }>): Promise<void> {
-  const response = await fetch(`${API_BASE}/api/items/batch-priority`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ items }),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to update priorities');
   }
 }
 
