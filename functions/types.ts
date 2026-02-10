@@ -7,6 +7,26 @@ export interface Env {
   SESSION_SECRET: string;
 }
 
+// Named priority levels (numeric value = sort order)
+export const PRIORITY_LEVELS = {
+  uber: 0,
+  high: 1,
+  normal: 2,
+  low: 3,
+  meh: 4,
+} as const;
+
+export type PriorityName = keyof typeof PRIORITY_LEVELS;
+export type PriorityValue = (typeof PRIORITY_LEVELS)[PriorityName];
+
+export const PRIORITY_NAMES: Record<number, PriorityName> = {
+  0: 'uber',
+  1: 'high',
+  2: 'normal',
+  3: 'low',
+  4: 'meh',
+};
+
 // Work item stored in D1
 export interface WorkItem {
   id: string;
@@ -19,7 +39,7 @@ export interface WorkItem {
   updated_at: string;
 }
 
-// GitHub item from API
+// GitHub item from API (enhanced with PR metadata)
 export interface GitHubItem {
   id: string;
   title: string;
@@ -31,6 +51,27 @@ export interface GitHubItem {
   updatedAt: string;
   repository: {
     nameWithOwner: string;
+  };
+  // PR-specific fields
+  mergeable?: 'MERGEABLE' | 'CONFLICTING' | 'UNKNOWN';
+  reviewDecision?: 'APPROVED' | 'CHANGES_REQUESTED' | 'REVIEW_REQUIRED' | null;
+  reviewRequests?: {
+    totalCount: number;
+  };
+  reviews?: {
+    nodes: Array<{
+      state: string;
+      author: { login: string } | null;
+    }>;
+  };
+  commits?: {
+    nodes: Array<{
+      commit: {
+        statusCheckRollup: {
+          state: 'SUCCESS' | 'FAILURE' | 'PENDING' | 'ERROR' | 'EXPECTED';
+        } | null;
+      };
+    }>;
   };
 }
 
@@ -46,9 +87,14 @@ export interface CombinedItem {
   isDraft: boolean;
   createdAt: string;
   updatedAt: string;
-  priority: number;
+  priority: PriorityValue;
+  priorityName: PriorityName;
   notes: string | null;
   hidden: boolean;
+  // PR-specific metadata
+  ciStatus: 'success' | 'failure' | 'pending' | 'error' | null;
+  mergeable: 'mergeable' | 'conflicting' | 'unknown' | null;
+  reviewStatus: 'approved' | 'changes_requested' | 'review_required' | 'pending_review' | null;
 }
 
 // Session data stored in cookie

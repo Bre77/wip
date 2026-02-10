@@ -3,7 +3,7 @@ import type { GitHubItem } from '../types';
 const GITHUB_GRAPHQL_URL = 'https://api.github.com/graphql';
 const CACHE_TTL = 300; // 5 minutes
 
-// GraphQL query to fetch user's open PRs
+// GraphQL query to fetch user's open PRs with CI, merge, and review status
 const PULL_REQUESTS_QUERY = `
   query {
     viewer {
@@ -19,6 +19,28 @@ const PULL_REQUESTS_QUERY = `
           updatedAt
           repository {
             nameWithOwner
+          }
+          mergeable
+          reviewDecision
+          reviewRequests {
+            totalCount
+          }
+          reviews(last: 10) {
+            nodes {
+              state
+              author {
+                login
+              }
+            }
+          }
+          commits(last: 1) {
+            nodes {
+              commit {
+                statusCheckRollup {
+                  state
+                }
+              }
+            }
           }
         }
       }
